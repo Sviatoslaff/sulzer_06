@@ -12,6 +12,13 @@ Dim qtyRows, visibleRows, intRow, grid, bExit, bAbort, txtStatus
 Dim excelFile
 excelFile = selectExcel()
 
+qtn = "20330001"
+session.findById("wnd[0]").maximize
+session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
+session.findById("wnd[0]").sendVKey 0
+session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text = qtn
+session.findById("wnd[0]").sendVKey 0
+
 '2. Заполняем открытый SAP Quotation
 Dim ArticlesExcel, objWorkbook, ws
 Set ArticlesExcel = CreateObject("Excel.Application")
