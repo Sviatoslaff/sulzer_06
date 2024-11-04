@@ -37,15 +37,15 @@ Function GetExcelArray()
 	
 	' Считаем, что в 4 строке - начало таблицы для обработки
 	Dim intRow : intRow = 4
-	Dim i
+	Dim iCol
 	' Цикл для каждой строки
 	On Error Resume Next
-	Do Until ArticlesExcel.Cells(intRow, firstRow).Value = ""
+	Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 		ReDim Preserve arrExcel(intRow - 4, 6)
-		WScript.Echo ArticlesExcel.Cells(intRow - 4, serRow).Value
-		For i = firstCol to lastCol
-			arrExcel(intRow - 4, i - firstCol) = ArticlesExcel.Cells(intRow, i).Value
-		Next i
+		WScript.Echo ArticlesExcel.Cells(intRow, firstCol).Value
+		For iCol = firstCol to lastCol
+			arrExcel(intRow - 4, iCol - firstCol) = ArticlesExcel.Cells(intRow, iCol).Value
+		Next 
 		intRow = intRow + 1
 	Loop
 	objWorkbook.Close False
