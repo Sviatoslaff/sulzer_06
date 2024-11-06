@@ -17,12 +17,15 @@ Dim iCol
 Dim excelFile
 excelFile = selectExcel()
 
-qtn = "50002648"
-session.findById("wnd[0]").maximize
-session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
-session.findById("wnd[0]").sendVKey 0
-session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text = qtn
-session.findById("wnd[0]").sendVKey 0
+
+
+'2.0 - открываем транзакцию
+' qtn = "50002648"
+' session.findById("wnd[0]").maximize
+' session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
+' session.findById("wnd[0]").sendVKey 0
+' session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text = qtn
+' session.findById("wnd[0]").sendVKey 0
 
 '2. Заполняем открытый SAP Quotation
 Dim ArticlesExcel, objWorkbook, ws
@@ -34,9 +37,10 @@ Dim iLastRow: iLastRow = CInt(0)
 iLastRow = ws.Range("A" & ws.Rows.Count).End(xlUp).Row  
 'WScript.Echo iLastRow
 
+
 'On Error Resume Next
 sapRow = 0
-Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
+Do Until ArticlesExcel.Cells(intRow, firstCol).Value = "000"
 	'ReDim Preserve arrExcel(intRow - 4, 6)
 	'WScript.Echo ArticlesExcel.Cells(intRow, firstCol).Value
 '    Err.Clear
@@ -67,17 +71,29 @@ MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 	End If    
 
 	For iCol = firstCol to lastCol
-		grid.GetCell(sapRow, iCol - firstCol + 2).Text = ArticlesExcel.Cells(intRow, iCol).Value
+		grid.GetCell(sapRow, iCol - firstCol + 1).Text = ArticlesExcel.Cells(intRow, iCol).Value
+		обрезать, если больше 40 сим
 	Next 
 	'WScript.Echo arrExcel(intRow - 4, 0)
 	intRow = intRow + 1
 	sapRow = sapRow + 1
 
 Loop
+test()
 
+'3. Транспонируем
 
-'3. 
+Sub test()
+  Dim sourceRange As Range
+  Dim targetRange As Range
 
+  Set sourceRange = ActiveSheet.Range(Cells(3, 3), Cells(intRow - 1, 8))
+  TextSheet = objWorkbook.Sheets.Add("Text2")
+  Set targetRange = TextSheet.Cells(1, 1)
+
+  sourceRange.Copy
+  targetRange.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=True
+End Sub
 
 
 
