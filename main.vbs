@@ -1,18 +1,23 @@
 Option Explicit
 Const xlUp = -4162
 Public Const firstCol = 39, lastCol = 45
+'''Public Const firstCol = 40, lastCol = 40
 
 Public Const resNoTemplate = " template not found. Check the template.  "
 Public Const resNoBOM = "Nothing is inside this BOM. First make the BOM."
 
+Dim tblArea
 Dim qtn, plant, sorg, template, serno
-Dim qtyRows, visibleRows, intRow, grid, bExit, bAbort, txtStatus
+Dim qtyRows, rowCount, visibleRows, sapRow, goto_pos, grid, cell 
+Dim bExit, bAbort, txtStatus
+Dim intRow : intRow = 4
+Dim iCol
 
 '1. Запрашиваем файл QTN и получаем массив значений для последующего заполнения SAP Quotation
 Dim excelFile
 excelFile = selectExcel()
 
-qtn = "20330001"
+qtn = "50002648"
 session.findById("wnd[0]").maximize
 session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
 session.findById("wnd[0]").sendVKey 0
@@ -28,45 +33,46 @@ Set ws = objWorkbook.Worksheets("PMU")
 Dim iLastRow: iLastRow = CInt(0)
 iLastRow = ws.Range("A" & ws.Rows.Count).End(xlUp).Row  
 'WScript.Echo iLastRow
-On Error Resume Next
+
+'On Error Resume Next
+sapRow = 0
 Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 	'ReDim Preserve arrExcel(intRow - 4, 6)
 	'WScript.Echo ArticlesExcel.Cells(intRow, firstCol).Value
-    Err.Clear
+'    Err.Clear
     tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_KONTRAKT", "GuiTableControl").Id
-    Set grid = session.findById(tblArea)
-    sapRow = grid.currentRow                'Here is the current visible row of the QTN
-MsgBox "sap Row: " & sapRow
+'''    tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_ANGEBOT", "GuiTableControl").Id
+     Set grid = session.findById(tblArea)
+'    sapRow = grid.currentRow                'Here is the current visible row of the QTN
+MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 
 	If sapRow > 7 Then
 		rowCount = grid.RowCount
 		goto_pos = session.findById(tblArea & "/txtVBAP-POSNR[0," & sapRow - 5 & "]").text
 		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
+'''		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\02/ssubSUBSCREEN_BODY:SAPMV45A:4411/subSUBSCREEN_TC:SAPMV45A:4912/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
 		session.findById("wnd[1]/usr/txtRV45A-POSNR").text = goto_pos
 		session.findById("wnd[1]/usr/txtRV45A-POSNR").caretPosition = 3
 		session.findById("wnd[1]").sendVKey 0
 		WScript.Sleep 300
 
 		tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_KONTRAKT", "GuiTableControl").Id
+'''		tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_ANGEBOT", "GuiTableControl").Id		
 		Set grid = session.findById(tblArea)
 		sapRow = grid.currentRow                'Here is the current visible row of the QTN
 		Set cell = grid.GetCell(sapRow + 5, 1)
 		cell.setFocus()
 		sapRow = grid.currentRow                'Here is the current visible row of the QTN
 
-	MsgBox "new sap Row: " & sapRow
-
 	End If    
 
 	For iCol = firstCol to lastCol
-		session.findById(tblArea & "/txtVBAP-POSNR[0," & iCol + 1 - firstCol & "]").text = ArticlesExcel.Cells(intRow, iCol).Value
+		grid.GetCell(sapRow, iCol - firstCol + 2).Text = ArticlesExcel.Cells(intRow, iCol).Value
 	Next 
 	'WScript.Echo arrExcel(intRow - 4, 0)
 	intRow = intRow + 1
 	sapRow = sapRow + 1
-	Set cell = grid.GetCell(sapRow, 1)
-	cell.SetFocus()
-	session.findById("wnd[0]").sendVKey 0
+
 Loop
 
 
@@ -76,7 +82,8 @@ Loop
 
 
 
-
+objWorkbook.Close False
+ArticlesExcel.Quit
 MsgBox "Script finished! ", vbSystemModal Or vbInformation
 
 '====== Functions ans Subs ========
