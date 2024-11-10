@@ -71,8 +71,7 @@ MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 	End If    
 
 	For iCol = firstCol to lastCol
-		grid.GetCell(sapRow, iCol - firstCol + 1).Text = ArticlesExcel.Cells(intRow, iCol).Value
-		обрезать, если больше 40 сим
+		grid.GetCell(sapRow, iCol - firstCol + 1).Text = Left(ArticlesExcel.Cells(intRow, iCol).Value, 40)
 	Next 
 	'WScript.Echo arrExcel(intRow - 4, 0)
 	intRow = intRow + 1
@@ -88,14 +87,53 @@ Sub test()
   Dim targetRange As Range
 
   Set sourceRange = ActiveSheet.Range(Cells(3, 3), Cells(intRow - 1, 8))
-  TextSheet = objWorkbook.Sheets.Add("Text2")
+  TextSheet = objWorkbook.Sheets.Select("Text")
   Set targetRange = TextSheet.Cells(1, 1)
 
   sourceRange.Copy
   targetRange.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=True
 End Sub
 
+'4.Вставляем текстовые значения из транспонированной таблицы
+goto_pos = session.findById(tblArea & "/txtVBAP-POSNR[0,0]").text
+session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
+'''		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\02/ssubSUBSCREEN_BODY:SAPMV45A:4411/subSUBSCREEN_TC:SAPMV45A:4912/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
+session.findById("wnd[1]/usr/txtRV45A-POSNR").text = goto_pos
+session.findById("wnd[1]/usr/txtRV45A-POSNR").caretPosition = 3
+session.findById("wnd[1]").sendVKey 0
+WScript.Sleep 300
+Set grid = session.findById(tblArea)
+sapRow = grid.currentRow  
+Set cell = grid.GetCell(sapRow, 1)
+cell.setFocus()	'перешли на нужную строку
 
+'Подготовка заголовка
+objWorkbook.Sheets("Text").Activate
+Set TextSheet = objWorkbook.Worksheets("Text")
+Dim spaces
+Dim arrTexts(5, 1)
+For intRow = 1 To 6		'делаем заголовки с пробелами до 18 символов
+	spaces = ""
+	if Len(TextSheet.Cells(1, intRow).Value) < 18
+		spaces = Space(18 - Len(TextSheet.Cells(1, intRow).Value))
+	End if	
+	arrTexts(intRow - 1, 0) = TextSheet.Cells(1, intRow).Value & spaces
+Next
+
+Dim strText
+session.findById("wnd[0]").sendVKey 2
+session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08").select	'зашли в тексты позиции
+For intRow = 1 To iLastRow
+	strText = ""
+	For iCol = 1 To 6		'склеиваем заголовки со значениями
+		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(intRow + 1, iCol).Value & vbCrLf 
+	Next	
+	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text
+	if intRow < iLastRow
+		session.findById("wnd[0]/tbar[1]/btn[19]").press 'кнопка перехода по позициям
+	end if	
+Next
+session.findById("wnd[0]/tbar[0]/btn[3]").press	'вышли на главный экран
 
 
 objWorkbook.Close False
@@ -137,6 +175,9 @@ Function GetExcelArray()
 	WScript.Echo Join(arrExcel)
 	GetExcelArray = arrExcel
 End Function
+
+
+
 
 
 Sub OutputToExcel
