@@ -17,8 +17,6 @@ Dim iCol
 Dim excelFile
 excelFile = selectExcel()
 
-
-
 '2.0 - открываем транзакцию
  qtn = "50002648"
  session.findById("wnd[0]").maximize
@@ -78,7 +76,7 @@ MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 	sapRow = sapRow + 1
 
 Loop
-test()
+test
 
 '3. Транспонируем
 
@@ -115,7 +113,7 @@ Dim spaces
 Dim arrTexts(5, 1)
 For intRow = 1 To 6		'делаем заголовки с пробелами до 18 символов
 	spaces = ""
-	if Len(TextSheet.Cells(1, intRow).Value) < 18
+	if Len(TextSheet.Cells(1, intRow).Value) < 18 Then
 		spaces = Space(18 - Len(TextSheet.Cells(1, intRow).Value))
 	End if	
 	arrTexts(intRow - 1, 0) = TextSheet.Cells(1, intRow).Value & spaces
@@ -130,7 +128,7 @@ For intRow = 1 To iLastRow
 		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(intRow + 1, iCol).Value & vbCrLf 
 	Next	
 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text
-	if intRow < iLastRow
+	if intRow < iLastRow then
 		session.findById("wnd[0]/tbar[1]/btn[19]").press 'кнопка перехода по позициям
 	end if	
 Next
