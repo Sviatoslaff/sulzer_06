@@ -1,5 +1,5 @@
 Option Explicit
-Const xlUp = -4162
+Const xlUp = -4162, xlPasteValues = -4163, xlNone = -4162
 Public Const firstCol = 39, lastCol = 45
 '''Public Const firstCol = 40, lastCol = 40
 
@@ -20,21 +20,21 @@ excelFile = selectExcel()
 
 
 '2.0 - открываем транзакцию
-' qtn = "50002648"
-' session.findById("wnd[0]").maximize
-' session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
-' session.findById("wnd[0]").sendVKey 0
-' session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text = qtn
-' session.findById("wnd[0]").sendVKey 0
+ qtn = "50002648"
+ session.findById("wnd[0]").maximize
+ session.findById("wnd[0]/tbar[0]/okcd").text = "VA22"
+ session.findById("wnd[0]").sendVKey 0
+ session.findById("wnd[0]/usr/ctxtVBAK-VBELN").text = qtn
+ session.findById("wnd[0]").sendVKey 0
 
 '2. Заполняем открытый SAP Quotation
-Dim ArticlesExcel, objWorkbook, ws
+Dim ArticlesExcel, objWorkbook, pmu
 Set ArticlesExcel = CreateObject("Excel.Application")
 Set objWorkbook = ArticlesExcel.Workbooks.Open(excelFile)
 objWorkbook.Sheets("PMU").Activate
-Set ws = objWorkbook.Worksheets("PMU")
+Set pmu = objWorkbook.Worksheets("PMU")
 Dim iLastRow: iLastRow = CInt(0)
-iLastRow = ws.Range("A" & ws.Rows.Count).End(xlUp).Row  
+iLastRow =pmu.Range("A" & pmu.Rows.Count).End(xlUp).Row  
 'WScript.Echo iLastRow
 
 
@@ -83,15 +83,16 @@ test()
 '3. Транспонируем
 
 Sub test()
-  Dim sourceRange As Range
-  Dim targetRange As Range
+  Dim sourceRange
+  Dim targetRange
 
-  Set sourceRange = ActiveSheet.Range(Cells(3, 3), Cells(intRow - 1, 8))
+  Set sourceRange = pmu.Range(Cells(3, 3), pmu.Cells(iLastRow, 8))
   TextSheet = objWorkbook.Sheets.Select("Text")
   Set targetRange = TextSheet.Cells(1, 1)
 
   sourceRange.Copy
-  targetRange.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=True
+  targetRange.PasteSpecial xlPasteValues, xlNone, False, True
+  pmu.Cells(3,3).Copy
 End Sub
 
 '4.Вставляем текстовые значения из транспонированной таблицы
