@@ -46,7 +46,7 @@ Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 '''    tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_ANGEBOT", "GuiTableControl").Id
      Set grid = session.findById(tblArea)
 '    sapRow = grid.currentRow                'Here is the current visible row of the QTN
-MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
+'MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 
 	If sapRow > 7 Then
 		rowCount = grid.RowCount
@@ -85,8 +85,9 @@ Sub transpose()
   Dim sourceRange
   Dim targetRange
 
-  Set sourceRange = pmu.Range(Cells(3, 3), pmu.Cells(iLastRow, 8))
-  TextSheet = objWorkbook.Sheets.Select("Text")
+  Set sourceRange = pmu.Range(pmu.Cells(3, 3), pmu.Cells(iLastRow, 8))
+  objWorkbook.Sheets("Text").Activate
+  Set TextSheet = objWorkbook.Worksheets("Text")
   Set targetRange = TextSheet.Cells(1, 1)
 
   sourceRange.Copy
