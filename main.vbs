@@ -26,7 +26,7 @@ excelFile = selectExcel()
  session.findById("wnd[0]").sendVKey 0
 
 '2. Заполняем открытый SAP Quotation
-Dim ArticlesExcel, objWorkbook, pmu
+Dim ArticlesExcel, objWorkbook, pmu, TextSheet
 Set ArticlesExcel = CreateObject("Excel.Application")
 Set objWorkbook = ArticlesExcel.Workbooks.Open(excelFile)
 objWorkbook.Sheets("PMU").Activate
