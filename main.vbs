@@ -1,5 +1,5 @@
 Option Explicit
-Const xlUp = -4162, xlPasteValues = -4163, xlNone = -4162
+Const xlUp = -4162, xlPasteValues = -4163, xlNone = -4142
 Public Const firstCol = 39, lastCol = 45
 '''Public Const firstCol = 40, lastCol = 40
 
@@ -96,6 +96,7 @@ Sub transpose()
 End Sub
 
 '4.Вставляем текстовые значения из транспонированной таблицы
+tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_KONTRAKT", "GuiTableControl").Id
 goto_pos = session.findById(tblArea & "/txtVBAP-POSNR[0,0]").text
 session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
 '''		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\02/ssubSUBSCREEN_BODY:SAPMV45A:4411/subSUBSCREEN_TC:SAPMV45A:4912/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
@@ -103,6 +104,7 @@ session.findById("wnd[1]/usr/txtRV45A-POSNR").text = goto_pos
 session.findById("wnd[1]/usr/txtRV45A-POSNR").caretPosition = 3
 session.findById("wnd[1]").sendVKey 0
 WScript.Sleep 300
+
 Set grid = session.findById(tblArea)
 sapRow = grid.currentRow  
 Set cell = grid.GetCell(sapRow, 1)
@@ -129,7 +131,7 @@ For intRow = 1 To iLastRow
 	For iCol = 1 To 6		'склеиваем заголовки со значениями
 		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(intRow + 1, iCol).Value & vbCrLf 
 	Next	
-	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text
+	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text = strText
 	if intRow < iLastRow then
 		session.findById("wnd[0]/tbar[1]/btn[19]").press 'кнопка перехода по позициям
 	end if	
