@@ -38,7 +38,7 @@ iLastRow =pmu.Range("A" & pmu.Rows.Count).End(xlUp).Row
 
 'On Error Resume Next
 sapRow = 0
-Do Until ArticlesExcel.Cells(intRow, firstCol).Value = "000"
+Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 	'ReDim Preserve arrExcel(intRow - 4, 6)
 	'WScript.Echo ArticlesExcel.Cells(intRow, firstCol).Value
 '    Err.Clear
@@ -76,11 +76,12 @@ MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 	sapRow = sapRow + 1
 
 Loop
-test
+
+
 
 '3. Транспонируем
-
-Sub test()
+transpose
+Sub transpose()
   Dim sourceRange
   Dim targetRange
 
@@ -134,6 +135,7 @@ For intRow = 1 To iLastRow
 Next
 session.findById("wnd[0]/tbar[0]/btn[3]").press	'вышли на главный экран
 
+'5. 
 
 objWorkbook.Close False
 ArticlesExcel.Quit
