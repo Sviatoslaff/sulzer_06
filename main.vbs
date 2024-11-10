@@ -1,5 +1,5 @@
 Option Explicit
-Const xlUp = -4162
+Const xlUp = -4162, xlPasteValues = -4163, xlNone = -4142
 Public Const firstCol = 39, lastCol = 45
 '''Public Const firstCol = 40, lastCol = 40
 
@@ -15,6 +15,7 @@ Dim iCol
 
 '1. Запрашиваем файл QTN и получаем массив значений для последующего заполнения SAP Quotation
 Dim excelFile
+Dim TextSheet
 excelFile = selectExcel()
 
 
@@ -28,19 +29,19 @@ excelFile = selectExcel()
 ' session.findById("wnd[0]").sendVKey 0
 
 '2. Заполняем открытый SAP Quotation
-Dim ArticlesExcel, objWorkbook, ws
+Dim ArticlesExcel, objWorkbook, pmu
 Set ArticlesExcel = CreateObject("Excel.Application")
 Set objWorkbook = ArticlesExcel.Workbooks.Open(excelFile)
 objWorkbook.Sheets("PMU").Activate
-Set ws = objWorkbook.Worksheets("PMU")
+Set pmu = objWorkbook.Worksheets("PMU")
 Dim iLastRow: iLastRow = CInt(0)
-iLastRow = ws.Range("A" & ws.Rows.Count).End(xlUp).Row  
+iLastRow = pmu.Range("A" & pmu.Rows.Count).End(xlUp).Row  
 'WScript.Echo iLastRow
 
 
 'On Error Resume Next
 sapRow = 0
-Do Until ArticlesExcel.Cells(intRow, firstCol).Value = "000"
+Do Until 5=5 'ArticlesExcel.Cells(intRow, firstCol).Value = ""
 	'ReDim Preserve arrExcel(intRow - 4, 6)
 	'WScript.Echo ArticlesExcel.Cells(intRow, firstCol).Value
 '    Err.Clear
@@ -72,33 +73,35 @@ MsgBox "sap Row: " & sapRow, vbSystemModal Or vbInformation
 
 	For iCol = firstCol to lastCol
 		grid.GetCell(sapRow, iCol - firstCol + 1).Text = ArticlesExcel.Cells(intRow, iCol).Value
-		обрезать, если больше 40 сим
+'		обрезать, если больше 40 сим
 	Next 
 	'WScript.Echo arrExcel(intRow - 4, 0)
 	intRow = intRow + 1
 	sapRow = sapRow + 1
 
 Loop
-test()
+test
 
 '3. Транспонируем
 
-Sub test()
-  Dim sourceRange As Range
-  Dim targetRange As Range
+Sub test
+  Dim sourceRange 
+  Dim targetRange
 
-  Set sourceRange = ActiveSheet.Range(Cells(3, 3), Cells(intRow - 1, 8))
-  TextSheet = objWorkbook.Sheets.Add("Text2")
+  Set sourceRange = pmu.Range(pmu.Cells(3, 3), pmu.Cells(iLastRow, 8))
+  Set TextSheet = objWorkbook.Sheets.Add()
+  TextSheet.Name = "Text4"
   Set targetRange = TextSheet.Cells(1, 1)
 
   sourceRange.Copy
-  targetRange.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=True
+  targetRange.PasteSpecial xlPasteValues, xlNone, False, True
+  pmu.Cells(3, 3).Copy
 End Sub
 
 
 
 
-objWorkbook.Close False
+objWorkbook.Close True
 ArticlesExcel.Quit
 MsgBox "Script finished! ", vbSystemModal Or vbInformation
 
