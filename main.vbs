@@ -17,6 +17,8 @@ Dim iCol
 Dim excelFile
 excelFile = selectExcel()
 
+
+
 '2.0 - открываем транзакцию
  qtn = "50002648"
  session.findById("wnd[0]").maximize
@@ -78,7 +80,6 @@ Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 Loop
 
 
-
 '3. Транспонируем
 transpose
 Sub transpose()
@@ -95,12 +96,14 @@ Sub transpose()
   pmu.Cells(3,3).Copy
 End Sub
 
+
+
 '4.Вставляем текстовые значения из транспонированной таблицы
 tblArea = UserArea.findByName("SAPMV45ATCTRL_U_ERF_KONTRAKT", "GuiTableControl").Id
 goto_pos = session.findById(tblArea & "/txtVBAP-POSNR[0,0]").text
 session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
 '''		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\02/ssubSUBSCREEN_BODY:SAPMV45A:4411/subSUBSCREEN_TC:SAPMV45A:4912/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
-session.findById("wnd[1]/usr/txtRV45A-POSNR").text = goto_pos
+session.findById("wnd[1]/usr/txtRV45A-POSNR").text = 10
 session.findById("wnd[1]/usr/txtRV45A-POSNR").caretPosition = 3
 session.findById("wnd[1]").sendVKey 0
 WScript.Sleep 300
@@ -109,6 +112,7 @@ Set grid = session.findById(tblArea)
 sapRow = grid.currentRow  
 Set cell = grid.GetCell(sapRow, 1)
 cell.setFocus()	'перешли на нужную строку
+
 
 'Подготовка заголовка
 objWorkbook.Sheets("Text").Activate
@@ -126,19 +130,46 @@ Next
 Dim strText
 session.findById("wnd[0]").sendVKey 2
 session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08").select	'зашли в тексты позиции
-For intRow = 1 To iLastRow
+intRow = 1
+Do Until TextSheet.Cells(1, intRow + 1).Value = ""
 	strText = ""
 	For iCol = 1 To 6		'склеиваем заголовки со значениями
-		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(intRow + 1, iCol).Value & vbCrLf 
+		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(iCol, intRow + 1).Value & vbCrLf 
 	Next	
+	MsgBox strText
 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text = strText
 	if intRow < iLastRow then
 		session.findById("wnd[0]/tbar[1]/btn[19]").press 'кнопка перехода по позициям
 	end if	
-Next
-session.findById("wnd[0]/tbar[0]/btn[3]").press	'вышли на главный экран
+    intRow = intRow + 1
+Loop
 
-'5. 
+
+'5. Вставка цен
+session.findById("wnd[0]/tbar[0]/btn[3]").press
+session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/tblSAPMV45ATCTRL_U_ERF_KONTRAKT/txtVBAP-ARKTX[4,0]").setFocus
+session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4426/subSUBSCREEN_TC:SAPMV45A:4908/tblSAPMV45ATCTRL_U_ERF_KONTRAKT/txtVBAP-ARKTX[4,0]").caretPosition = 2
+session.findById("wnd[0]").sendVKey 2
+session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05").select
+WScript.Sleep 300
+
+
+intRow = 4
+Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
+	If session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
+		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").text = ArticlesExcel.Cells(intRow, 12).Value
+		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").setFocus
+		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").caretPosition = 9
+		session.findById("wnd[0]").sendVKey 0
+		session.findById("wnd[0]/tbar[1]/btn[19]").press
+	Else 
+		MsgBox "Условие ZLS3 не найдено! Переход к следующей строке.", vbSystemModal Or vbInformation
+	End	if
+Loop
+
+session.findById("wnd[0]/tbar[0]/btn[3]").press
+session.findById("wnd[0]/tbar[0]/btn[11]").press
+session.findById("wnd[1]/usr/btnSPOP-VAROPTION1").press
 
 objWorkbook.Close False
 ArticlesExcel.Quit
