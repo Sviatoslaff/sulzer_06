@@ -37,10 +37,11 @@ Dim spaces
 Dim arrTexts(5, 1)
 For intRow = 1 To 6		'делаем заголовки с пробелами до 18 символов
 	spaces = ""
-	if Len(TextSheet.Cells(1, intRow).Value) < 18 Then
-		spaces = Space(18 - Len(TextSheet.Cells(1, intRow).Value))
+	if Len(TextSheet.Cells(intRow, 1).Value) < 18 Then
+		spaces = Space(18 - Len(TextSheet.Cells(intRow, 1).Value))
 	End if	
-	arrTexts(intRow - 1, 0) = TextSheet.Cells(1, intRow).Value & spaces
+	arrTexts(intRow - 1, 0) = TextSheet.Cells(intRow, 1).Value & spaces
+    'MsgBox arrTexts(intRow - 1, 0)
 Next
 
 
