@@ -161,11 +161,12 @@ Dim iRow
 Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 	' Цикл для каждой строки в ценовых условиях
 	qtyRows = grid.rowCount - 1
+	MsgBox qtyRows
 	iRow = 0
+	MsgBox grid.GetCell(7, 3).Text 
 	WScript.Sleep 300
 	Do Until iRow > qtyRows
 		'MsgBox "Row: " & intRow
-		MsgBox grid.GetCell(7, 3).Text 
 		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
 			grid.GetCell(iRow, 3).setFocus()
 			WScript.Sleep 100
@@ -176,7 +177,7 @@ Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 		End If	
 		iRow = iRow + 1
 	Loop
-
+	intRow = intRow + 1
 
 	' If session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
 	' 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").text = ArticlesExcel.Cells(intRow, 12).Value
