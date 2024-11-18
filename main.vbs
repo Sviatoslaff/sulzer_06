@@ -17,8 +17,6 @@ Dim iCol
 Dim excelFile
 excelFile = selectExcel()
 
-
-
 '2.0 - открываем транзакцию
  qtn = "50002648"
  session.findById("wnd[0]").maximize
