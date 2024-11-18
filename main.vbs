@@ -153,22 +153,36 @@ session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_B
 session.findById("wnd[0]").sendVKey 2
 session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05").select
 WScript.Sleep 300
+tblArea = UserArea.findByName("SAPLV69ATCTRL_KONDITIONEN", "GuiTableControl").Id
+Set grid = session.findById(tblArea)
 
-objWorkbook.Sheets("PMU").Activate
-Set TextSheet = objWorkbook.Worksheets("PMU")
-Set grid = session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN")
 intRow = 4
-Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
-	If  session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
-		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").text = ArticlesExcel.Cells(intRow, 12).Value
-		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").setFocus
-		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").caretPosition = 9
-		session.findById("wnd[0]").sendVKey 0
-		session.findById("wnd[0]/tbar[1]/btn[19]").press
-	Else 
-		MsgBox "Условие ZLS3 не найдено! Переход к следующей строке.", vbSystemModal Or vbInformation
-	End if
-	intRow = intRow + 1
+Dim iRow
+Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
+	' Цикл для каждой строки в ценовых условиях
+	qtyRows = grid.rowCount - 1
+	iRow = 0
+	Do Until iRow > qtyRows
+		'MsgBox "Row: " & intRow
+		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
+			grid.GetCell(iRow, 3).setFocus
+			grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
+			session.findById("wnd[0]").sendVKey(0)
+			session.findById("wnd[0]/tbar[1]/btn[19]").press()
+		End If	
+		iRow = iRow + 1
+	Loop
+
+
+	' If session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
+	' 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").text = ArticlesExcel.Cells(intRow, 12).Value
+	' 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").setFocus
+	' 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").caretPosition = 9
+	' 	session.findById("wnd[0]").sendVKey 0
+	' 	session.findById("wnd[0]/tbar[1]/btn[19]").press
+	' Else 
+	' 	MsgBox "Условие ZLS3 не найдено! Переход к следующей строке.", vbSystemModal Or vbInformation
+	' Endif
 Loop
 
 session.findById("wnd[0]/tbar[0]/btn[3]").press
@@ -314,24 +328,6 @@ For Each serno In arrSerno
 		
 	End If
 Next
-
-Set grid = session.findById("wnd[0]/usr/cntlEXTEND/shellcont/shell")
-			
-qtyRows = grid.rowCount - 1
-'MsgBox "Rows amount: " & qtyRows
-visibleRows = grid.VisibleRowCount
-
-' Цикл для каждой строки
-'On Error Resume Next
-intRow = 0
-Do Until intRow > qtyRows
-	'Err.Clear
-	'MsgBox "Row: " & intRow
-	grid.modifyCell intRow, "TEMPLATE", template
-	grid.currentCellRow = intRow
-	intRow = intRow + 1
-Loop
-grid.triggerModified
 
 OutputToExcel
 
