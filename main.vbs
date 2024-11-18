@@ -125,7 +125,7 @@ For intRow = 1 To 6		'делаем заголовки с пробелами до
 		spaces = Space(18 - Len(TextSheet.Cells(intRow, 1).Value))
 	End if	
 	arrTexts(intRow - 1, 0) = TextSheet.Cells(intRow, 1).Value & spaces
-    MsgBox arrTexts(intRow - 1, 0)
+    'MsgBox arrTexts(intRow - 1, 0)
 Next
 
 Dim strText
@@ -137,7 +137,7 @@ Do Until TextSheet.Cells(1, intRow + 1).Value = ""
 	For iCol = 1 To 6		'склеиваем заголовки со значениями
 		strText = strText & arrTexts(iCol - 1, 0) & TextSheet.Cells(iCol, intRow + 1).Value & vbCrLf 
 	Next	
-	MsgBox strText
+	'MsgBox strText
 	session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\08/ssubSUBSCREEN_BODY:SAPMV45A:4152/subSUBSCREEN_TEXT:SAPLV70T:2100/cntlSPLITTER_CONTAINER/shellcont/shellcont/shell/shellcont[1]/shell").text = strText
 	if intRow < iLastRow then
 		session.findById("wnd[0]/tbar[1]/btn[19]").press 'кнопка перехода по позициям
@@ -166,6 +166,7 @@ Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 		'MsgBox "Row: " & intRow
 		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
 			grid.GetCell(iRow, 3).setFocus
+			MsgBox grid.GetCell(iRow, 4).Text
 			grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
 			session.findById("wnd[0]").sendVKey(0)
 			session.findById("wnd[0]/tbar[1]/btn[19]").press()
