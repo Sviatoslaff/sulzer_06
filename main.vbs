@@ -154,10 +154,12 @@ session.findById("wnd[0]").sendVKey 2
 session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05").select
 WScript.Sleep 300
 
-
+objWorkbook.Sheets("PMU").Activate
+Set TextSheet = objWorkbook.Worksheets("PMU")
+Set grid = session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN")
 intRow = 4
-Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
-	If session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
+Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
+	If  session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[1,7]").text = "ZLS3" Then
 		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").text = ArticlesExcel.Cells(intRow, 12).Value
 		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").setFocus
 		session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05/ssubSUBSCREEN_BODY:SAPLV69A:6201/tblSAPLV69ATCTRL_KONDITIONEN/txtKOMV-KBETR[3,7]").caretPosition = 9
@@ -165,7 +167,8 @@ Do Until ArticlesExcel.Cells(intRow, firstCol).Value = ""
 		session.findById("wnd[0]/tbar[1]/btn[19]").press
 	Else 
 		MsgBox "Условие ZLS3 не найдено! Переход к следующей строке.", vbSystemModal Or vbInformation
-	End	if
+	End if
+	intRow = intRow + 1
 Loop
 
 session.findById("wnd[0]/tbar[0]/btn[3]").press
@@ -311,6 +314,24 @@ For Each serno In arrSerno
 		
 	End If
 Next
+
+Set grid = session.findById("wnd[0]/usr/cntlEXTEND/shellcont/shell")
+			
+qtyRows = grid.rowCount - 1
+'MsgBox "Rows amount: " & qtyRows
+visibleRows = grid.VisibleRowCount
+
+' Цикл для каждой строки
+'On Error Resume Next
+intRow = 0
+Do Until intRow > qtyRows
+	'Err.Clear
+	'MsgBox "Row: " & intRow
+	grid.modifyCell intRow, "TEMPLATE", template
+	grid.currentCellRow = intRow
+	intRow = intRow + 1
+Loop
+grid.triggerModified
 
 OutputToExcel
 
