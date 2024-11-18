@@ -167,10 +167,11 @@ Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 	WScript.Sleep 300
 	Do Until iRow > qtyRows
 		'MsgBox "Row: " & intRow
+		Set grid = session.findById(tblArea)
 		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
+			grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
 			grid.GetCell(iRow, 3).setFocus()
 			WScript.Sleep 100
-			grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
 			session.findById("wnd[0]").sendVKey(0)
 			session.findById("wnd[0]/tbar[1]/btn[19]").press()
 			iRow = qtyRows + 100
