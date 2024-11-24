@@ -167,9 +167,20 @@ Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 		'MsgBox "Row: " & intRow
 		Set grid = session.findById(tblArea)
 		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
-			grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
-			grid.GetCell(iRow, 3).setFocus()
 			WScript.Sleep 100
+			' ** didn't work
+			' ** grid.GetCell(iRow, 3).Text = ArticlesExcel.Cells(intRow, 12).Value
+			' ** grid.GetCell(iRow, 3).setFocus()
+			' ** grid.GetCell(iRow, 3)..caretPosition = 16
+			grid.GetCell(iRow, 1).setFocus()
+			grid.GetCell(iRow, 1).caretPosition = 2	
+			' get in the condition ZLS3
+			session.findById("wnd[0]").sendVKey 2
+			session.findById("wnd[0]/usr/txtKOMV-KBETR").text =  ArticlesExcel.Cells(intRow, 12).Value
+			session.findById("wnd[0]/usr/txtKOMV-KBETR").caretPosition = 15
+			session.findById("wnd[0]").sendVKey(0)
+			session.findById("wnd[0]/tbar[0]/btn[3]").press()		
+		
 			session.findById("wnd[0]").sendVKey(0)
 			session.findById("wnd[0]/tbar[1]/btn[19]").press()
 			iRow = qtyRows + 100
