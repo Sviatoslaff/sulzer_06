@@ -153,11 +153,13 @@ session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_ITEM/tabpT\05").select()
 WScript.Sleep 300
 tblArea = UserArea.findByName("SAPLV69ATCTRL_KONDITIONEN", "GuiTableControl").Id
 Set grid = session.findById(tblArea)
-
+objWorkbook.Sheets("PMU").Activate
 intRow = 4
 Dim iRow
 Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 	' Цикл для каждой строки в ценовых условиях
+	tblArea = UserArea.findByName("SAPLV69ATCTRL_KONDITIONEN", "GuiTableControl").Id
+	Set grid = session.findById(tblArea)
 	qtyRows = grid.rowCount - 1
 	MsgBox qtyRows
 	iRow = 0
@@ -165,7 +167,6 @@ Do Until ArticlesExcel.Cells(intRow, 12).Value = ""
 	WScript.Sleep 300
 	Do Until iRow > qtyRows
 		'MsgBox "Row: " & intRow
-		Set grid = session.findById(tblArea)
 		if grid.GetCell(iRow, 1).Text = "ZLS3" Then
 			WScript.Sleep 100
 			' ** didn't work
